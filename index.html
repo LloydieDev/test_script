@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenX MVA Script and Guidelines</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
+    .container {
+        width: 50%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    h2 {
+        color: #333;
+        font-size: 18px;
+    }
+    p {
+        color: #555;
+        line-height: 1.6;
+    }
+    label {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+    }
+    select, input[type="text"], input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0 20px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    button {
+        width: 100%;
+        padding: 15px;
+        background-color: #28a745;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    button:hover {
+        background-color: #218838;
+    }
+    button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+    .transfer-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    .transfer-buttons button {
+        width: 32%;
+    }
+    .result {
+        margin-top: -15px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GenX MVA Script and Guidelines</h1>
+    <form id="mvaForm">
+        <h2>INTRODUCTION</h2>
+        <p>
+            Hi, <b>--A--first_name--B--</b> this is  <br>
+            <b>--A--fullname--B--</b> <br>
+            from American Family Assistance in a recorded line. <br>
+            We've received your inquiry about an accident and the possibility of compensation. <br>
+            Before transferring to your legal team, are you located in state <b>--A--state--B--</b>?
+        </p>
+
+        <label for="involvedInAccident">Were you involved in a motor vehicle accident within the past 2 years?</label>
+        <select id="involvedInAccident" name="involvedInAccident" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="accidentDate">Exact Date of Accident:</label>
+        <input type="date" id="accidentDate" name="accidentDate" required>
+        <div id="dateResult" class="result"></div>
+
+        <label for="policeReport">Did the police issue a report stating the other party was at fault?</label>
+        <select id="policeReport" name="policeReport" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="injured">Were you injured as a result of this accident?</label>
+        <select id="injured" name="injured" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="injuryCause">Was the Injury Caused by:</label>
+        <select id="injuryCause" name="injuryCause" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Car Accident">Car Accident</option>
+            <option value="Motorcycle Accident">Motorcycle Accident</option>
+            <option value="Commercial Vehicle Accident">Commercial Vehicle Accident</option>
+            <option value="Truck Accident">Truck Accident</option>
+        </select>
+
+        <label for="medicalTreatment">Have you sought medical treatment as a result of this accident?</label>
+        <select id="medicalTreatment" name="medicalTreatment" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="represented">Are you currently being represented by an attorney?</label>
+        <select id="represented" name="represented" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="responsible">And just to clarify, you were not responsible for this accident?</label>
+        <select id="responsible" name="responsible" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="talkToLegal">Would you like to talk to our legal team for a free consultation with your case?</label>
+        <select id="talkToLegal" name="talkToLegal" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div class="transfer-buttons">
+        <button id="transfer6Months" disabled>Transfer (6 Months)</button>
+        <button id="transfer1Year" disabled>Transfer (1 Year)</button>
+        <button id="transfer2Years" disabled>Transfer (2 Years)</button>
+    </div>
+</div>
+
+<script>
+document.getElementById('accidentDate').addEventListener('change', function() {
+    const accidentDate = new Date(this.value);
+    const today = new Date();
+    
+    let years = today.getFullYear() - accidentDate.getFullYear();
+    let months = today.getMonth() - accidentDate.getMonth();
+    let days = today.getDate() - accidentDate.getDate();
+
+    if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    const dateResult = document.getElementById('dateResult');
+    dateResult.innerText = `It has been ${years} years, ${months} months, and ${days} days since the accident.`;
+
+    const diffTime = today - accidentDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    document.getElementById('transfer6Months').disabled = diffDays > 183;
+    document.getElementById('transfer1Year').disabled = diffDays > 730;
+    document.getElementById('transfer2Years').disabled = diffDays > 1095;
+});
+
+document.getElementById('mvaForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const clientName = document.getElementById('clientName').value;
+    document.getElementById('clientNameDisplay').innerText = clientName;
+    alert('Form submitted. Proceed with the call transfer.');
+});
+
+function transferCall(period) {
+    const accidentDate = new Date(document.getElementById('accidentDate').value);
+    const today = new Date();
+    const diffTime = today - accidentDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let message = '';
+    switch (period) {
+        case '6months':
+            message = diffDays <= 183 ? 'Transferring for accidents within the last 6 months.' : 'Accident is older than 6 months. Transferring is not possible.';
+            break;
+        case '1year':
+            message = diffDays <= 365 ? 'Transferring for accidents within the last year.' : 'Accident is older than 1 year. Transferring is not possible.';
+            break;
+        case '2years':
+            message = diffDays <= 730 ? 'Transferring for accidents within the last 2 years.' : 'Accident is older than 2 years. Transferring is not possible.';
+            break;
+        default:
+            message = 'Unknown period';
+    }
+    alert(message);
+}
+
+document.getElementById('transfer6Months').addEventListener('click', function() {
+    transferCall('6months');
+});
+
+document.getElementById('transfer1Year').addEventListener('click', function() {
+    transferCall('1year');
+});
+
+document.getElementById('transfer2Years').addEventListener('click', function() {
+    transferCall('2years');
+});
+</script>
+
+</body>
+</html>
